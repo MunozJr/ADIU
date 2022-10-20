@@ -79,14 +79,19 @@
 
 
 <script>
+    var firstGraph;
+    var secondGraph;
+    var thirdGraph;
     // We make the AJAX call
     $.ajax({
-        url: "MasterController.php",    //the page containing php script
+        url: "DataLayer.php",    //the page containing php script
         type: "get",    //request type,
         dataType: 'json',
         //data: { registration: "success", name: "xyz", email: "abc@gmail.com" },
         success: function (result) {
-            $('#cambio').text(result.abc);
+            firstGraph = result[0];
+            secondGraph = result[1];
+            thirdGraph = result[2];
             return;
         },
         error: function (xhr, ajaxOptions, thrownError) {
