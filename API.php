@@ -48,7 +48,6 @@ if ($result = mysqli_query($con, $sql)) {
 }
 
 // Third procedure
-
 $sql = " SELECT Study_year,COUNT(study_year) as Course FROM university_students_monthly_expenses GROUP BY Study_year;";
 $aux3 = array();
 if ($result = mysqli_query($con, $sql)) {
@@ -65,11 +64,11 @@ if ($result = mysqli_query($con, $sql)) {
 
 $con->close();
 
-
+// Joining the DataBase data
 $finalData[] = $aux1;
 $finalData[] = $aux2;
 $finalData[] = $aux3;
 
-
+// We return the collected Data
 echo json_encode($finalData);
 
