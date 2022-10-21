@@ -17,23 +17,23 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <!-- Web-Page name -->
     <title>Data Dashboard</title>
 </head>
 
 <body>
-    <!-- Cuadrito gris general donde ira todo encima -->
+    <!-- Gray top's square -->
     <nav class="navbar navbar-dark bg-dark">
-        <!-- Div para colocar los elementos -->
+        <!-- Div placeholder -->
         <div class="container-fluid">
-            <!-- El titulo de la parte superior -->
-            <p class="h1" style="color: white;"> XXXX Dashboard</p>
-            <!-- Lista de elementos horizontales -->
+            <!-- Top's title -->
+            <p class="h1" style="color: white;"> Students' Data Dashboard</p>
+            <!-- Horizontal elements' list -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link navbar-brand active" aria-current="page" href="https://www.uib.es/">UIB</a>
                 </li>
                 <li class="nav-item">
-                    <!-- TO-DO: Enlace a los datos -->
                     <a class="nav-link active"
                         href="https://www.kaggle.com/datasets/shariful07/nice-work-thanks-for-share?resource=download">Data
                         Source</a>
@@ -41,57 +41,40 @@
             </ul>
         </div>
     </nav>
-    <!-- Parte inferior de los graficos... -->
+    <!-- Bottom graphics creation -->
     <div class="container">
+        <!-- First graphic -->
         <div class="row align-items-start">
-            <div class="col">
-                One of three columns
-                <img src="../imagen1.png" style="max-width: 250px;">
-            </div>
-            <div class="col">
-                One of three columns
-                <img src="../imagen2.jpg" style="max-width: 250px;">
-            </div>
-            <div class="col">
-                One of three columns
-                <img src="../imagen3.jpg" style="max-width: 250px;">
+            <div id="container" class="border border-dark" style="width:100%; height:400px;">
             </div>
         </div>
+        <!-- Second graphic -->
         <div class="row align-items-center">
-            <div class="col">
-                One of three columns
-            </div>
-            <div class="col">
-                One of three columns
-            </div>
-            <div class="col">
-                One of three columns
+            <div id="container2" class="border border-dark" style="width:100%; height:400px;">
             </div>
         </div>
-    </div>
-    <div id="container" style="width:100%; height:400px;">
-        <p id="cambio"> </p>
+        <!-- Third graphic -->
+        <div class="row align-items-end">
+            <div id="container3" class="border border-dark" style="width:100%; height:400px;">
+            </div>
+        </div>
     </div>
 </body>
 
 </html>
 
-
-
 <script>
-    var firstGraph;
-    var secondGraph;
-    var thirdGraph;
     // We make the AJAX call
     $.ajax({
-        url: "DataLayer.php",    //the page containing php script
+        url: "API.php",    //the page containing php script
         type: "get",    //request type,
         dataType: 'json',
-        //data: { registration: "success", name: "xyz", email: "abc@gmail.com" },
         success: function (result) {
-            firstGraph = result[0];
-            secondGraph = result[1];
-            thirdGraph = result[2];
+            var firstGraph = result[0];
+            var secondGraph = result[1];
+            var thirdGraph = result[2];
+            // Auxiliar function to create the graphics
+            createGraphics(firstGraph, secondGraph, thirdGraph);
             return;
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -100,32 +83,222 @@
         }
     });
 
-    //document.getElementById("cambio").innerHTML = "ERROR";
-    $('#cambio').text("ERROR");
+    function createGraphics(firstGraph, secondGraph, thirdGraph) {
+        createFirstGraphic(firstGraph);
+        createSecondGraphic(secondGraph);
+        createThirdGraphic(thirdGraph);
+    }
 
-    // document.addEventListener('DOMContentLoaded', function () {
-    //     const chart = Highcharts.chart('container', {
-    //         chart: {
-    //             type: 'bar'
-    //         },
-    //         title: {
-    //             text: 'Fruit Consumption'
-    //         },
-    //         xAxis: {
-    //             categories: ['Apples', 'Bananas', 'Oranges']
-    //         },
-    //         yAxis: {
-    //             title: {
-    //                 text: 'Fruit eaten'
-    //             }
-    //         },
-    //         series: [{
-    //             name: 'Jane',
-    //             data: [1, 0, 4]
-    //         }, {
-    //             name: 'John',
-    //             data: [5, 7, 3]
-    //         }]
-    //     });
-    // });
+    function createFirstGraphic(firstGraph) {
+        let aux = 0;
+        for (let i = 0; i < firstGraph.length; i++) {
+            aux += parseInt(firstGraph[i].Total_Expenses);
+        }
+        Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                align: 'center',
+                text: 'Total expenses per gender'
+            },
+            accessibility: {
+                announceNewData: {
+                    enabled: true
+                }
+            },
+            xAxis: {
+                type: 'category'
+            },
+            yAxis: {
+                title: {
+                    text: 'Total percent expenses'
+                }
+
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y:.1f}%'
+                    }
+                }
+            },
+
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+            },
+
+            series: [
+                {
+                    name: "Gender",
+                    colorByPoint: true,
+                    data: [
+                        {
+                            name: firstGraph[1].Gender,
+                            y: (firstGraph[1].Total_Expenses / aux) * 100
+                        },
+                        {
+                            name: firstGraph[0].Gender,
+                            y: (firstGraph[0].Total_Expenses / aux) * 100
+                        },
+
+                    ]
+                }
+            ]
+        });
+    }
+
+    function createSecondGraphic(secondGraph) {
+        let totalMen = 0;
+        let totalWomen = 0;
+        let menCaracts = [0, 0, 0, 0, 0, 0];
+        let womenCaracts = [0, 0, 0, 0, 0, 0];
+
+        for (let i = 0; i < secondGraph.length; i++) {
+            if (secondGraph[i].Gender == "Male ") {
+                secondGraph[i].cosmetics == '1' ? menCaracts[0]++ : menCaracts[0];
+                secondGraph[i].drinks == '1' ? menCaracts[1]++ : menCaracts[1];
+                secondGraph[i].game_hobbies == '1' ? menCaracts[2]++ : menCaracts[2];
+                secondGraph[i].smoking == '1' ? menCaracts[3]++ : menCaracts[3];
+                secondGraph[i].transport == '1' ? menCaracts[4]++ : menCaracts[4];
+                menCaracts[5] += parseInt(secondGraph[i].monthly_expenses);
+                totalMen++;
+            } else {
+                secondGraph[i].cosmetics == '1' ? womenCaracts[0]++ : womenCaracts[0];
+                secondGraph[i].drinks == '1' ? womenCaracts[1]++ : womenCaracts[1];
+                secondGraph[i].game_hobbies == '1' ? womenCaracts[2]++ : womenCaracts[2];
+                secondGraph[i].smoking == '1' ? womenCaracts[3]++ : womenCaracts[3];
+                secondGraph[i].transport == '1' ? womenCaracts[4]++ : womenCaracts[4];
+                womenCaracts[5] += parseInt(secondGraph[i].monthly_expenses);
+                totalWomen++;
+            }
+        }
+
+        Highcharts.chart('container2', {
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'How the expenses are divided'
+            },
+            subtitle: {
+                text: 'Source: <a ' +
+                    'href="https://www.kaggle.com/datasets/shariful07/nice-work-thanks-for-share?resource=download">Kaggle.com</a>'
+            },
+            xAxis: {
+                categories: ['Cosmetics', 'Drinks', 'Games', 'Smoking', 'Transport', 'Monthly Expenses'],
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Total People',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify'
+                }
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true
+                    }
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -40,
+                y: 80,
+                floating: true,
+                borderWidth: 1,
+                backgroundColor:
+                    Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF',
+                shadow: true
+            },
+            credits: {
+                enabled: false
+            },
+            series: [{
+                name: 'Men',
+                data: [menCaracts[0], menCaracts[1], menCaracts[2], menCaracts[3], menCaracts[4]]
+            }, {
+                name: 'Women',
+                data: [womenCaracts[0], womenCaracts[1], womenCaracts[2], womenCaracts[3], womenCaracts[4]]
+            }]
+        });
+    }
+
+    function createThirdGraphic(thirdGraph) {
+        let aux = 0;
+        for (let i = 1; i < thirdGraph.length; i++) {
+            aux += parseInt(thirdGraph[i].Course);
+        }
+        Highcharts.chart('container3', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'University Students Courses'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+            series: [{
+                name: 'Courses',
+                colorByPoint: true,
+                data: [
+                    {
+                        name: thirdGraph[1].Study_year,
+                        y: thirdGraph[1].Course / aux,
+                        sliced: true
+                    },
+                    {
+                        name: thirdGraph[2].Study_year,
+                        y: thirdGraph[2].Course / aux,
+                        sliced: true
+                    },
+                    {
+                        name: thirdGraph[3].Study_year,
+                        y: thirdGraph[3].Course / aux,
+                        sliced: true
+                    },
+                    {
+                        name: thirdGraph[4].Study_year,
+                        y: thirdGraph[4].Course / aux,
+                        sliced: true
+                    }]
+            }]
+
+        });
+    }
+
 </script>

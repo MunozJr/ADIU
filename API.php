@@ -27,7 +27,7 @@ if ($result = mysqli_query($con, $sql)) {
 }
 
 // Second procedure
-$sql = "SELECT Gender, Age, if(Transporting = 'yes',1, 0) as transport,"; 
+$sql = "SELECT Gender, Age, if(Transporting = 'No',0, 1) as transport,"; 
 $sql .= "if(Smoking = 'yes',1,0) as smoking,";
 $sql .= "if(Drinks = 'yes',1,0) as drinks,";
 $sql .= "if(Games_Hobbies = 'yes', 1,0) as game_hobbies,";
